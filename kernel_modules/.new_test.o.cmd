@@ -1393,6 +1393,52 @@ deps_/home/edward/Documents/vMem/kernel_modules/new_test.o := \
   include/linux/kvm_dirty_ring.h \
     $(wildcard include/config/HAVE_KVM_DIRTY_RING) \
     $(wildcard include/config/HAVE_HVM_DIRTY_RING) \
+  include/linux/hugetlb.h \
+    $(wildcard include/config/ARCH_HAS_HUGEPD) \
+    $(wildcard include/config/ARCH_ENABLE_HUGEPAGE_MIGRATION) \
+    $(wildcard include/config/ARCH_WANT_HUGE_PMD_SHARE) \
+  include/linux/hugetlb_inline.h \
+  include/linux/userfaultfd_k.h \
+    $(wildcard include/config/PTE_MARKER_UFFD_WP) \
+  include/uapi/linux/userfaultfd.h \
+  include/linux/swap.h \
+    $(wildcard include/config/FRONTSWAP) \
+    $(wildcard include/config/THP_SWAP) \
+  include/linux/memcontrol.h \
+  include/linux/page_counter.h \
+  include/linux/vmpressure.h \
+  include/linux/eventfd.h \
+  include/uapi/linux/eventfd.h \
+  include/linux/writeback.h \
+  include/linux/flex_proportions.h \
+  include/linux/backing-dev-defs.h \
+    $(wildcard include/config/DEBUG_FS) \
+  include/linux/blk_types.h \
+    $(wildcard include/config/FAIL_MAKE_REQUEST) \
+    $(wildcard include/config/BLK_CGROUP_IOCOST) \
+    $(wildcard include/config/BLK_INLINE_ENCRYPTION) \
+    $(wildcard include/config/BLK_DEV_INTEGRITY) \
+  include/linux/bvec.h \
+  include/linux/highmem.h \
+  include/linux/cacheflush.h \
+  arch/x86/include/asm/cacheflush.h \
+  include/asm-generic/cacheflush.h \
+  include/linux/kmsan.h \
+  include/linux/dma-direction.h \
+  include/linux/highmem-internal.h \
+  include/linux/bio.h \
+  include/linux/mempool.h \
+  include/linux/pagemap.h \
+  include/uapi/linux/mempolicy.h \
+  include/linux/swapops.h \
+  include/linux/swapfile.h \
+  include/linux/mempolicy.h \
+    $(wildcard include/config/TMPFS) \
+  arch/x86/include/asm/hugetlb.h \
+  include/asm-generic/hugetlb.h \
+    $(wildcard include/config/ARCH_HAS_GIGANTIC_PAGE) \
+  arch/x86/include/asm/set_memory.h \
+  include/asm-generic/set_memory.h \
 
 /home/edward/Documents/vMem/kernel_modules/new_test.o: $(deps_/home/edward/Documents/vMem/kernel_modules/new_test.o)
 

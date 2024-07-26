@@ -40,13 +40,22 @@ __used __section("__versions") = {
 	{ 0x5c3c7387, "kstrtoull" },
 	{ 0xf0fdf6cb, "__stack_chk_fail" },
 	{ 0x8892a383, "single_open" },
-	{ 0xba8fbd64, "_raw_spin_lock" },
-	{ 0x20b8e413, "gfn_to_memslot" },
-	{ 0x7cd8d75e, "page_offset_base" },
-	{ 0xb5b54b34, "_raw_spin_unlock" },
-	{ 0xf1d94c00, "seq_printf" },
-	{ 0x4c9d28b0, "phys_base" },
 	{ 0xf9f6b762, "proc_remove" },
+	{ 0xba8fbd64, "_raw_spin_lock" },
+	{ 0x64a351ae, "__tracepoint_mmap_lock_start_locking" },
+	{ 0x668b19a1, "down_read" },
+	{ 0x39ce9680, "__tracepoint_mmap_lock_acquire_returned" },
+	{ 0x34f84e64, "follow_pte" },
+	{ 0xf1d94c00, "seq_printf" },
+	{ 0xb5b54b34, "_raw_spin_unlock" },
+	{ 0xfea99ed9, "__tracepoint_mmap_lock_released" },
+	{ 0x53b954a2, "up_read" },
+	{ 0x1e698e2a, "gfn_to_hva" },
+	{ 0xf7ff86c5, "gfn_to_pfn" },
+	{ 0x4e3fd1b4, "kvm_release_pfn_clean" },
+	{ 0xb8f3bc88, "__mmap_lock_do_trace_released" },
+	{ 0xef43ff65, "__mmap_lock_do_trace_acquire_returned" },
+	{ 0xd1808488, "__mmap_lock_do_trace_start_locking" },
 	{ 0xe5b2f88b, "seq_read" },
 	{ 0xba5251f9, "seq_lseek" },
 	{ 0x859ee6d8, "single_release" },
@@ -61,4 +70,4 @@ __used __section("__versions") = {
 MODULE_INFO(depends, "kvm");
 
 
-MODULE_INFO(srcversion, "CCE172C2AB5D92CB6B315D1");
+MODULE_INFO(srcversion, "9930C98B720CDA0D0072DAF");
