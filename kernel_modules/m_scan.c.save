@@ -1,0 +1,451 @@
+
+ #include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/kvm_host.h>
+#include <linux/kvm.h>
+#include <linux/mm.h>
+#include <linux/proc_fs.h>
+#include <linux/uaccess.h>
+#include <linux/memory.h>
+static struct proc_dir_entry *proc_entry;
+#include <linux/memblock.h>
+#include <asm/pgtable.h>
+#include <asm/pgtable.h>
+#include <asm/pgtable.h>
+#include <linux/khugepaged.h>
+#include <linux/mm.h>
+#include <linux/mmzone.h>
+
+
+struct scan_data {
+	int free_pages;
+	int invalid_pages;
+	int other_pages;
+	int huge_pages;
+	int used_huge_pages;
+	int direct_pages;
+	int direct_1gb;
+	int direct_2mb;
+	int direct_4kb;
+	int user_pages;
+	int total_pages;
+};
+
+struct logic_data {
+	bool pmd;
+	bool pte;
+	bool pud;
+	bool unf;
+	bool present;
+};
+
+
+
+void walk_page_and_update(unsigned long vaddr, struct scan_data *data, struct logic_data *log) {
+	pgd_t *pgd_base;
+    pud_t *pud_base;
+    pmd_t *pmd_base;
+    pte_t *pte_base;
+
+    unsigned int level;
+    pte_t *pte;
+    pte_t *new_pte;
+    pmd_t new_pmd;
+    pud_t pud;
+
+//    if (!data) {
+ //       pr_err("Invalid input: scan_data is NULL\n");
+//        return;
+  //  }
+
+    // Use lookup_address to get the page table entry
+    pte = lookup_address(vaddr, &level);
+    if (!pte) {
+	log->unf=1;
+	return;
+    }
+
+    data->total_pages++;
+    // Check the level of the mapping
+    switch (level) {
+    case PG_LEVEL_4K: // 4KB page
+	log->pte = 1;
+	//if(pte_present(* pte)){
+	data->direct_4kb++;
+	//}
+        break;
+
+    case PG_LEVEL_2M: // 2MB page
+	new_pmd = *(pmd_t *) pte;
+	new_pte = pte_offset_kernel(&new_pmd,vaddr);
+	data->direct_2mb++;
+	if(!pmd_none(new_pmd)){
+		if(!pte_none(*new_pte) && (pte_val(*new_pte) & _PAGE_PRESENT)) {
+//			data->direct_4kb++;
+		}
+	}
+        break;
+
+    case PG_LEVEL_1G: // 1GB huge page data->huge_pages++; 
+	data->direct_1gb++;
+        break;
+    default:
+        pr_debug("Unknown page level: %u\n", level);
+//	data->direct_1gb++;
+        break;
+    }
+}
+
+
+bool is_pud_1gb_ignoring_holes(pud_t pud_entry)
+{
+    pmd_t *pmd_table;
+    int i;
+    int first_idx = -1;
+    int last_idx = -1;
+    unsigned long first_pfn = 0;
+    unsigned long last_pfn = 0;
+
+    /* 1) Convert the PUD's bits to a pointer to its PMD table. */
+    if (pud_none(pud_entry) || !pud_present(pud_entry)) {
+        pr_debug("PUD is none or not present\n");
+        return false;
+    }
+    if (pud_leaf(pud_entry)) {
+        pr_debug("PUD is actually a leaf (1GB) - not 'non-leaf'\n");
+        return false; /* This function expects non-leaf usage. */
+    }
+
+    pmd_table = (pmd_t *)__va(
+         ((pud_val(pud_entry) & PTE_PFN_MASK) >> PAGE_SHIFT) << PAGE_SHIFT
+    );
+    if (!pmd_table)
+        return false;
+
+    /* 2) Find the first present PMD (scanning forward). */
+    for (i = 0; i < PTRS_PER_PMD; i++) {
+        pmd_t pmd = pmd_table[i];
+        if (!pmd_none(pmd) && pmd_present(pmd)) {
+            first_idx = i;
+            /* Extract the PFN bits for this PMD. */
+            first_pfn = (pmd_val(pmd) & PTE_PFN_MASK) >> PAGE_SHIFT;
+            break;
+        }
+    }
+    if (first_idx < 0) {
+        /* No PMD is present at all. */
+        pr_debug("No present PMD found\n");
+printk("PUD PFN %lu",(unsigned long)pud_pfn(pud_entry));printk("PUD PFN %lu",(unsigned long)pud_pfn(pud_entry));        return false;
+    }
+
+    /* 3) Find the last present PMD (scanning backward). */
+    for (i = PTRS_PER_PMD - 1; i >= 0; i--) {
+        pmd_t pmd = pmd_table[i];
+        if (!pmd_none(pmd) && pmd_present(pmd)) {
+            last_idx = i;
+            last_pfn = (pmd_val(pmd) & PTE_PFN_MASK) >> PAGE_SHIFT;
+            break;
+        }
+    }
+    /* We already know last_idx >= first_idx if we found a 'first' one. */
+
+    /*
+     * 4) "Ignore holes." If the difference in start-PFN vs. end-PFN
+     * is exactly 511 * 512, then we say "it could be a 1 GB region."
+     *
+     * Explanation:
+     *   - For a fully used 1 GB, there should be 512 PMDs total (0..511).
+     *   - The difference in PMD-starts for i=0..511 is 511 "steps."
+     *   - Each step is 512 PFNs (2 MB / 4 KB).
+     *
+     * So if last_pfn == first_pfn + 511*512, we consider it 1 GB spanned.
+     */
+    {
+        unsigned long expected_diff = (511UL * 512UL);
+        unsigned long actual_diff   = (last_pfn - first_pfn);
+	for(;first_pfn<=last_pfn;first_pfn++){
+		if(!pfn_valid(first_pfn)){
+			return false;
+		}
+	}
+        if (actual_diff == expected_diff) {
+            /* This means from 'first' to 'last' is 1GB in PFN steps. */
+            pr_debug("Ignoring holes, PUD may be 1GB: first_idx=%d last_idx=%d PFN diff=%lu\n",
+                     first_idx, last_idx, actual_diff);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+bool is_pud_phys_contiguous(pud_t pud)
+{
+    pmd_t *pmd_table;
+    unsigned long pmd_idx;
+    unsigned long expected_pfn;
+
+    /*
+     * On x86_64, the physical address of the PMD page table
+     * is in pud_val(pud)'s PFN bits. We convert that to a kernel
+     * virtual address with __va().
+     *
+     * Note: In some kernel versions, you might use pmd_page_vaddr().
+     */
+    pmd_table = (pmd_t *)__va(
+        ((pud_val(pud) & PTE_PFN_MASK) >> PAGE_SHIFT) << PAGE_SHIFT
+    );
+    if (!pmd_table)
+        return false;  /* shouldn't normally happen */
+
+    /* Each PUD has 512 PMD entries in 4-level paging. */
+    for (pmd_idx = 0; pmd_idx < PTRS_PER_PMD; pmd_idx++) {
+        pmd_t pmd_entry = pmd_table[pmd_idx];
+
+        //page = pfn_to_page(iter_pfn);if (pmd_none(pmd_entry) || !pmd_present(pmd_entry)) {
+         //   printk("PMD %lu is none/not-present\n", pmd_idx);
+          //  return false;
+        //}
+        /* Must be a 2 MB leaf, not pointing to a PTE table. */
+        //if (pmd_leaf(pmd_entry)) {
+          //  printk("PMD %lu is not a huge (2 MB) leaf\n", pmd_idx);
+//	    continue;
+	//	continue;
+        //}
+        /* Check physical contiguity. */
+        {
+            unsigned long pfn =
+                (pmd_val(pmd_entry) & PTE_PFN_MASK) >> PAGE_SHIFT;
+            if (pmd_idx == 0) {
+                /* First PMD's PFN sets our initial reference. */
+                expected_pfn = pfn;
+            } else {
+                /* Must line up exactly after the previous 2 MB. */
+                if (pfn != expected_pfn) {
+                   printk("PMD %lu PFN mismatch: got %lu, expected %lu\n",
+                            pmd_idx, pfn, expected_pfn);
+                    return false;
+                }
+            }
+            /* Advance by 2 MB worth of 4 KB pages = 512. */
+            expected_pfn += (1UL << (PMD_SHIFT - PAGE_SHIFT));
+        }
+    }
+
+    /* If we reach here, all 512 PMDs were valid, 2 MB leaves, consecutively placed. */
+    return true;
+}
+
+
+void scan_zone(struct zone *zone, struct scan_data *scan_data){
+	unsigned long start_pfn = zone->zone_start_pfn;
+	unsigned long end_pfn = zone_end_pfn(zone);
+	unsigned long iter_pfn = start_pfn;
+	struct page *page;
+	unsigned long vaddr;
+	for(;iter_pfn<end_pfn;iter_pfn++){
+		struct logic_data log;
+//		if(!pfn_valid(iter_pfn)){
+//			scan_data->invalid_pages+=1;
+//			continue;
+//		}
+		
+//		page = pfn_to_page(iter_pfn);
+		vaddr = (unsigned long)phys_to_virt(iter_pfn<<PAGE_SHIFT);
+//		if(!page || PageReserved(page)){
+//		if(!page){
+//			scan_data->invalid_pages+=1;
+//			continue;
+//		}
+		scan_data->total_pages++;
+		//is this a user hugepage?
+//		if(PageHuge(page)||PageTransHuge(page) || PageCompound(page)){
+//			if(page_mapped(page)){
+//				scan_data->used_huge_pages++;
+//			}
+
+//			scan_data->huge_pages+=1;
+//			continue;
+//		}
+//		if(page_mapped(page)){
+//			continue;
+//		}
+		walk_page_and_update(vaddr,scan_data,&log);
+		//if it's not a user huge page, and it still is a huge page, must be kernel huge page
+//		if(log.present){
+//			if(!page_mapped(page)){
+//				continue;
+//			}
+		//not a huge page! this is where it gets difficult
+//        break;
+		//if a mapping exists AND it's not present in the kernel, and no PTE/PMD element exists, def user.
+		scan_data->other_pages+=1;
+//        break;
+	}
+}
+
+
+static unsigned long count_pud_leafs_in_init_mm(pgd_t *pgd_base)
+{
+    unsigned long count = 0;
+  // pgd_t *pgd_base = the_mm->pgd;
+    unsigned long pgd_idx;
+
+    for (pgd_idx = 0; pgd_idx < PTRS_PER_PGD; pgd_idx++) {
+        pgd_t pgd_entry = pgd_base[pgd_idx];
+        if (pgd_none(pgd_entry) || !pgd_present(pgd_entry))
+            continue;
+
+
+
+            unsigned long pgd_base_va = pgd_idx << PGDIR_SHIFT;
+            p4d_t *p4d_base = p4d_offset(&pgd_entry, pgd_base_va);
+            unsigned long p4d_idx;
+
+            for (p4d_idx = 0; p4d_idx < PTRS_PER_P4D; p4d_idx++) {
+                p4d_t p4d_entry = p4d_base[p4d_idx];
+                if (p4d_none(p4d_entry) || !p4d_present(p4d_entry))
+                    continue;
+
+                if (p4d_leaf(p4d_entry)) {
+                    /* 512GB leaf mapping at P4D level, skip going deeper */
+		    printk("WHAT?");
+                    continue;
+                }
+
+                {
+                    unsigned long p4d_base_va = pgd_base_va + 
+                        (p4d_idx << P4D_SHIFT);
+                    pud_t *pud_base = pud_offset(&p4d_entry, p4d_base_va);
+                    unsigned long pud_idx;
+
+                    for (pud_idx = 0; pud_idx < PTRS_PER_PUD; pud_idx++) {
+                        pud_t pud_entry = pud_base[pud_idx];
+
+                        //    continue;
+			//}
+			if(pud_leaf(pud_entry)){
+				//printk("PUD PFN %lu",(unsigned long)pud_pfn(pud_entry));
+				count++;
+				continue;
+			}
+			if(is_pud_1gb_ignoring_holes(pud_entry)){
+				printk("CONT 1G NO LEAF PUD PFN %lu",(unsigned long)pud_pfn(pud_entry));
+			}
+                    }
+                }
+            }
+    }
+
+    return count;
+}
+
+
+
+static void do_full_scan(void){
+	int nid; // node id
+	pg_data_t *pgdat;
+	int zoneid;
+	struct zone *zone;
+	struct scan_data scan_data = {0};
+	struct logic_data log;
+	int level;
+	scan_data.direct_4kb = 0;
+	scan_data.direct_2mb = 0;
+	scan_data.direct_1gb = 0;
+	unsigned long count = 0;
+	struct list_head *entry;
+	struct mm_struct *mm_init;
+	mm_init = get_init_mm();
+
+    /* Iterate over all mm_struct instances in init_mm's mmlist */
+	struct page *page;
+
+    pr_info("Iterating through all PGDs in pgd_list...\n");
+
+   // list_for_each_entry(page, &pgd_list, lru) {
+      //  pgd_t *pgd;
+
+    //    pgd = (pgd_t *)page_address(page);
+
+  //      printk("Found PGD at virtual address: %p\n", pgd);
+//	count+=count_pud_leafs_in_init_mm(pgd);
+    //}
+	count+=count_pud_leafs_in_init_mm(mm_init->pgd);
+	for_each_node_state(nid,N_MEMORY){
+		pgdat = NODE_DATA(nid);
+		for (zoneid = 0; zoneid <= pgdat->kcompactd_highest_zoneidx; zoneid++) {
+			zone = &pgdat->node_zones[zoneid];
+			if (!populated_zone(zone))
+			continue;
+			scan_zone(zone, &scan_data);
+		}
+	}
+
+//	for(unsigned long i = 0;i<30000000;i++){
+//		unsigned long vaddr;
+//		vaddr = (unsigned long)phys_to_virt(i<<PAGE_SHIFT);
+//		walk_page_and_update(vaddr,&scan_data,&log);
+//		pte_t *pte = lookup_address(vaddr, &level);
+//    		if (pte && pte_present(*pte)) {
+        // Count as 4k if present
+        		//scan_data.direct_4kb++;
+  //  		}
+//	}
+	unsigned long total_valid_kb = (scan_data.total_pages) * (PAGE_SIZE / 1024);
+	unsigned long total_size_huge = scan_data.huge_pages * (PAGE_SIZE/1024);
+	printk("Total valid memory: %lu KB\n", total_valid_kb);
+	printk("Top down count %d\n",count);
+	printk("Total used huge memory:%lu KB %d pages\n",scan_data.used_huge_pages * (PAGE_SIZE/1024), scan_data.used_huge_pages);
+	printk("Total direct mapping:%lu KB %d pages\n",scan_data.direct_pages * (PAGE_SIZE/1024), scan_data.direct_pages);
+	printk("Total user pages:%lu KB %d pages\n",scan_data.user_pages * (PAGE_SIZE/1024), scan_data.user_pages);
+	printk("Total DIRECT 4k pages:%lu KB %d pages\n",scan_data.direct_4kb * (PAGE_SIZE/1024), scan_data.direct_4kb);
+	printk("Total DIRECT 2MB pages:%lu KB %d pages\n",scan_data.direct_2mb * (PAGE_SIZE/1024), scan_data.direct_2mb);
+	printk("Total DIRECT 1GB pages:%lu KB %d pages\n",scan_data.direct_1gb * (PAGE_SIZE/1024), scan_data.direct_1gb);
+	printk("Total invalid pages:%lu KB %d pages\n",scan_data.invalid_pages * (PAGE_SIZE/1024), scan_data.invalid_pages);
+
+}
+
+static ssize_t gfn_write(struct file *file, const char __user *ubuf,
+                        size_t count, loff_t *ppos)
+{
+	char buf[32];
+	unsigned long gfn;
+    	if (count > sizeof(buf) - 1)
+        	return -EINVAL;
+    	if (copy_from_user(buf, ubuf, count))
+        	return -EFAULT;
+    	buf[count] = '\0';
+    	if (kstrtoul(buf, 0, &gfn))
+        	return -EINVAL;
+	do_full_scan();
+    	return count;
+}
+
+static const struct proc_ops gfn_fops = {
+    .proc_write = gfn_write,
+};
+
+static int __init gfn_module_init(void)
+{
+    proc_entry = proc_create("m_scan", 0666, NULL, &gfn_fops);
+    if (!proc_entry)
+        return -ENOMEM;
+    printk(KERN_INFO "m_scan loaded\n");
+    return 0;
+}
+
+static void __exit gfn_module_exit(void)
+{
+    proc_remove(proc_entry);
+    printk(KERN_INFO "m_scan unloaded\n");
+}
+
+module_init(gfn_module_init);
+module_exit(gfn_module_exit);
+
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("Your Name");
+MODULE_DESCRIPTION("m_scan module");
+

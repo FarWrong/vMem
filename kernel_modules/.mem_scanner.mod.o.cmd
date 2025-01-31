@@ -1,8 +1,8 @@
-savedcmd_/home/edward/Documents/vMem/kernel_modules/test.mod.o := gcc -Wp,-MMD,/home/edward/Documents/vMem/kernel_modules/.test.mod.o.d -nostdinc -I./arch/x86/include -I./arch/x86/include/generated -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/compiler-version.h -include ./include/linux/kconfig.h -include ./include/linux/compiler_types.h -D__KERNEL__ -fmacro-prefix-map=./= -std=gnu11 -fshort-wchar -funsigned-char -fno-common -fno-PIE -fno-strict-aliasing -Wall -Wundef -Werror=implicit-function-declaration -Werror=implicit-int -Werror=return-type -Werror=strict-prototypes -Wno-format-security -Wno-trigraphs -mno-sse -mno-mmx -mno-sse2 -mno-3dnow -mno-avx -fcf-protection=none -m64 -falign-jumps=1 -falign-loops=1 -mno-80387 -mno-fp-ret-in-387 -mpreferred-stack-boundary=3 -mskip-rax-setup -mtune=generic -mno-red-zone -mcmodel=kernel -Wno-sign-compare -fno-asynchronous-unwind-tables -mindirect-branch=thunk-extern -mindirect-branch-register -mindirect-branch-cs-prefix -mfunction-return=thunk-extern -fno-jump-tables -mharden-sls=all -fpatchable-function-entry=16,16 -fno-delete-null-pointer-checks -Wno-frame-address -Wno-format-truncation -Wno-format-overflow -Wno-address-of-packed-member -O2 -fno-allow-store-data-races -Wframe-larger-than=1024 -fstack-protector-strong -Wno-main -Wno-unused-but-set-variable -Wno-unused-const-variable -fno-omit-frame-pointer -fno-optimize-sibling-calls -fno-stack-clash-protection -fzero-call-used-regs=used-gpr -pg -mrecord-mcount -mfentry -DCC_USING_FENTRY -falign-functions=16 -Wvla -Wno-pointer-sign -Wcast-function-type -Wno-stringop-truncation -Wno-stringop-overflow -Wno-restrict -Wno-maybe-uninitialized -Wno-array-bounds -Wno-alloc-size-larger-than -Wimplicit-fallthrough=5 -fno-strict-overflow -fno-stack-check -fconserve-stack -Werror=date-time -Werror=incompatible-pointer-types -Werror=designated-init -Wno-packed-not-aligned -g -gdwarf-5 -fsanitize=bounds-strict -fsanitize=shift -fsanitize=bool -fsanitize=enum -DMODULE -DKBUILD_BASENAME='"test.mod"' -DKBUILD_MODNAME='"test"' -D__KBUILD_MODNAME=kmod_test -c -o /home/edward/Documents/vMem/kernel_modules/test.mod.o /home/edward/Documents/vMem/kernel_modules/test.mod.c
+savedcmd_/home/ed/Documents/vmem/kernel_modules/mem_scanner.mod.o := gcc -Wp,-MMD,/home/ed/Documents/vmem/kernel_modules/.mem_scanner.mod.o.d -nostdinc -I./arch/x86/include -I./arch/x86/include/generated -I./include -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/compiler-version.h -include ./include/linux/kconfig.h -include ./include/linux/compiler_types.h -D__KERNEL__ -fmacro-prefix-map=./= -std=gnu11 -fshort-wchar -funsigned-char -fno-common -fno-PIE -fno-strict-aliasing -mno-sse -mno-mmx -mno-sse2 -mno-3dnow -mno-avx -fcf-protection=none -m64 -falign-jumps=1 -falign-loops=1 -mno-80387 -mno-fp-ret-in-387 -mpreferred-stack-boundary=3 -mskip-rax-setup -mtune=generic -mno-red-zone -mcmodel=kernel -Wno-sign-compare -fno-asynchronous-unwind-tables -mindirect-branch=thunk-extern -mindirect-branch-register -mindirect-branch-cs-prefix -mfunction-return=thunk-extern -fno-jump-tables -mharden-sls=all -fpatchable-function-entry=16,16 -fno-delete-null-pointer-checks -O2 -fno-allow-store-data-races -fstack-protector-strong -fno-omit-frame-pointer -fno-optimize-sibling-calls -ftrivial-auto-var-init=zero -fno-stack-clash-protection -fzero-call-used-regs=used-gpr -pg -mrecord-mcount -mfentry -DCC_USING_FENTRY -falign-functions=16 -fstrict-flex-arrays=3 -fno-strict-overflow -fno-stack-check -fconserve-stack -Wall -Wundef -Werror=implicit-function-declaration -Werror=implicit-int -Werror=return-type -Werror=strict-prototypes -Wno-format-security -Wno-trigraphs -Wno-frame-address -Wno-address-of-packed-member -Wframe-larger-than=1024 -Wno-main -Wno-unused-but-set-variable -Wno-unused-const-variable -Wno-dangling-pointer -Wvla -Wno-pointer-sign -Wcast-function-type -Wno-array-bounds -Wno-alloc-size-larger-than -Wimplicit-fallthrough=5 -Werror=date-time -Werror=incompatible-pointer-types -Werror=designated-init -Wenum-conversion -Wno-unused-but-set-variable -Wno-unused-const-variable -Wno-restrict -Wno-packed-not-aligned -Wno-format-overflow -Wno-format-truncation -Wno-stringop-overflow -Wno-stringop-truncation -Wno-missing-field-initializers -Wno-type-limits -Wno-shift-negative-value -Wno-maybe-uninitialized -Wno-sign-compare -g -gdwarf-5 -fsanitize=bounds-strict -fsanitize=shift -fsanitize=bool -fsanitize=enum -DMODULE -DKBUILD_BASENAME='"mem_scanner.mod"' -DKBUILD_MODNAME='"mem_scanner"' -D__KBUILD_MODNAME=kmod_mem_scanner -c -o /home/ed/Documents/vmem/kernel_modules/mem_scanner.mod.o /home/ed/Documents/vmem/kernel_modules/mem_scanner.mod.c
 
-source_/home/edward/Documents/vMem/kernel_modules/test.mod.o := /home/edward/Documents/vMem/kernel_modules/test.mod.c
+source_/home/ed/Documents/vmem/kernel_modules/mem_scanner.mod.o := /home/ed/Documents/vmem/kernel_modules/mem_scanner.mod.c
 
-deps_/home/edward/Documents/vMem/kernel_modules/test.mod.o := \
+deps_/home/ed/Documents/vmem/kernel_modules/mem_scanner.mod.o := \
     $(wildcard include/config/UNWINDER_ORC) \
     $(wildcard include/config/MODULE_UNLOAD) \
     $(wildcard include/config/RETPOLINE) \
@@ -17,10 +17,14 @@ deps_/home/edward/Documents/vMem/kernel_modules/test.mod.o := \
     $(wildcard include/config/PAHOLE_HAS_BTF_TAG) \
     $(wildcard include/config/FUNCTION_ALIGNMENT) \
     $(wildcard include/config/CC_IS_GCC) \
+    $(wildcard include/config/X86_64) \
+    $(wildcard include/config/ARM64) \
     $(wildcard include/config/HAVE_ARCH_COMPILER_H) \
+    $(wildcard include/config/CC_HAS_COUNTED_BY) \
     $(wildcard include/config/CC_HAS_ASM_INLINE) \
   include/linux/compiler_attributes.h \
   include/linux/compiler-gcc.h \
+    $(wildcard include/config/GCC_ASM_GOTO_OUTPUT_WORKAROUND) \
     $(wildcard include/config/ARCH_USE_BUILTIN_BSWAP) \
     $(wildcard include/config/SHADOW_CALL_STACK) \
     $(wildcard include/config/KCOV) \
@@ -51,6 +55,7 @@ deps_/home/edward/Documents/vMem/kernel_modules/test.mod.o := \
     $(wildcard include/config/FUNCTION_ERROR_INJECTION) \
     $(wildcard include/config/DYNAMIC_DEBUG_CORE) \
   include/linux/list.h \
+    $(wildcard include/config/LIST_HARDENED) \
     $(wildcard include/config/DEBUG_LIST) \
   include/linux/container_of.h \
   include/linux/build_bug.h \
@@ -58,6 +63,7 @@ deps_/home/edward/Documents/vMem/kernel_modules/test.mod.o := \
     $(wildcard include/config/TRACE_BRANCH_PROFILING) \
     $(wildcard include/config/PROFILE_ALL_BRANCHES) \
     $(wildcard include/config/OBJTOOL) \
+    $(wildcard include/config/64BIT) \
   arch/x86/include/generated/asm/rwonce.h \
   include/asm-generic/rwonce.h \
   include/linux/kasan-checks.h \
@@ -68,7 +74,6 @@ deps_/home/edward/Documents/vMem/kernel_modules/test.mod.o := \
     $(wildcard include/config/UID16) \
     $(wildcard include/config/ARCH_DMA_ADDR_T_64BIT) \
     $(wildcard include/config/PHYS_ADDR_T_64BIT) \
-    $(wildcard include/config/64BIT) \
     $(wildcard include/config/ARCH_32BIT_USTAT_F_TINODE) \
   include/uapi/linux/types.h \
   arch/x86/include/generated/uapi/asm/types.h \
@@ -124,9 +129,9 @@ deps_/home/edward/Documents/vMem/kernel_modules/test.mod.o := \
     $(wildcard include/config/RETHUNK) \
     $(wildcard include/config/SLS) \
     $(wildcard include/config/FUNCTION_PADDING_BYTES) \
+    $(wildcard include/config/UML) \
   arch/x86/include/asm/ibt.h \
     $(wildcard include/config/X86_KERNEL_IBT) \
-    $(wildcard include/config/X86_64) \
   include/linux/math64.h \
     $(wildcard include/config/ARCH_SUPPORTS_INT128) \
   include/linux/math.h \
@@ -152,6 +157,7 @@ deps_/home/edward/Documents/vMem/kernel_modules/test.mod.o := \
     $(wildcard include/config/X86_IOPL_IOPERM) \
     $(wildcard include/config/STACKPROTECTOR) \
     $(wildcard include/config/VM86) \
+    $(wildcard include/config/X86_USER_SHADOW_STACK) \
     $(wildcard include/config/PARAVIRT_XXL) \
     $(wildcard include/config/X86_DEBUGCTLMSR) \
     $(wildcard include/config/CPU_SUP_AMD) \
@@ -166,28 +172,13 @@ deps_/home/edward/Documents/vMem/kernel_modules/test.mod.o := \
   arch/x86/include/asm/mem_encrypt.h \
     $(wildcard include/config/X86_MEM_ENCRYPT) \
   include/linux/init.h \
+    $(wildcard include/config/MEMORY_HOTPLUG) \
     $(wildcard include/config/HAVE_ARCH_PREL32_RELOCATIONS) \
     $(wildcard include/config/STRICT_KERNEL_RWX) \
     $(wildcard include/config/STRICT_MODULE_RWX) \
     $(wildcard include/config/LTO_CLANG) \
   include/linux/cc_platform.h \
     $(wildcard include/config/ARCH_HAS_CC_PLATFORM) \
-  arch/x86/include/uapi/asm/bootparam.h \
-  include/linux/screen_info.h \
-  include/uapi/linux/screen_info.h \
-  include/linux/apm_bios.h \
-  include/uapi/linux/apm_bios.h \
-  include/uapi/linux/ioctl.h \
-  arch/x86/include/generated/uapi/asm/ioctl.h \
-  include/asm-generic/ioctl.h \
-  include/uapi/asm-generic/ioctl.h \
-  include/linux/edd.h \
-  include/uapi/linux/edd.h \
-  arch/x86/include/asm/ist.h \
-  arch/x86/include/uapi/asm/ist.h \
-  include/video/edid.h \
-    $(wildcard include/config/X86) \
-  include/uapi/video/edid.h \
   arch/x86/include/asm/math_emu.h \
   arch/x86/include/asm/ptrace.h \
     $(wildcard include/config/PARAVIRT) \
@@ -266,7 +257,6 @@ deps_/home/edward/Documents/vMem/kernel_modules/test.mod.o := \
   include/linux/byteorder/generic.h \
   arch/x86/include/asm/percpu.h \
     $(wildcard include/config/X86_64_SMP) \
-    $(wildcard include/config/UML) \
   include/linux/kernel.h \
     $(wildcard include/config/PREEMPT_VOLUNTARY_BUILD) \
     $(wildcard include/config/PREEMPT_DYNAMIC) \
@@ -286,6 +276,7 @@ deps_/home/edward/Documents/vMem/kernel_modules/test.mod.o := \
   include/asm-generic/bitops/generic-non-atomic.h \
   arch/x86/include/asm/bitops.h \
   arch/x86/include/asm/rmwcc.h \
+  include/linux/args.h \
   include/asm-generic/bitops/sched.h \
   arch/x86/include/asm/arch_hweight.h \
   include/asm-generic/bitops/const_hweight.h \
@@ -327,6 +318,7 @@ deps_/home/edward/Documents/vMem/kernel_modules/test.mod.o := \
     $(wildcard include/config/LOCK_STAT) \
   include/linux/once_lite.h \
   include/linux/dynamic_debug.h \
+  include/linux/sprintf.h \
   include/linux/static_call_types.h \
     $(wildcard include/config/HAVE_STATIC_CALL) \
   include/linux/instruction_pointer.h \
@@ -369,13 +361,17 @@ deps_/home/edward/Documents/vMem/kernel_modules/test.mod.o := \
   include/linux/string.h \
     $(wildcard include/config/BINARY_PRINTF) \
     $(wildcard include/config/FORTIFY_SOURCE) \
-  include/linux/errno.h \
-  include/uapi/linux/errno.h \
+  include/linux/err.h \
   arch/x86/include/generated/uapi/asm/errno.h \
   include/uapi/asm-generic/errno.h \
   include/uapi/asm-generic/errno-base.h \
+  include/linux/errno.h \
+  include/uapi/linux/errno.h \
+  include/linux/overflow.h \
   include/uapi/linux/string.h \
   include/linux/fortify-string.h \
+    $(wildcard include/config/CC_HAS_KASAN_MEMINTRINSIC_PREFIX) \
+    $(wildcard include/config/GENERIC_ENTRY) \
   include/linux/atomic.h \
   arch/x86/include/asm/atomic.h \
   arch/x86/include/asm/cmpxchg.h \
@@ -405,6 +401,10 @@ deps_/home/edward/Documents/vMem/kernel_modules/test.mod.o := \
   arch/x86/include/asm/msr.h \
   arch/x86/include/asm/cpumask.h \
   arch/x86/include/uapi/asm/msr.h \
+  include/uapi/linux/ioctl.h \
+  arch/x86/include/generated/uapi/asm/ioctl.h \
+  include/asm-generic/ioctl.h \
+  include/uapi/asm-generic/ioctl.h \
   arch/x86/include/asm/shared/msr.h \
   include/linux/tracepoint-defs.h \
   arch/x86/include/asm/special_insns.h \
@@ -420,9 +420,9 @@ deps_/home/edward/Documents/vMem/kernel_modules/test.mod.o := \
   arch/x86/include/asm/fpu/types.h \
   arch/x86/include/asm/vmxfeatures.h \
   arch/x86/include/asm/vdso/processor.h \
+  arch/x86/include/asm/shstk.h \
   include/linux/personality.h \
   include/uapi/linux/personality.h \
-  include/linux/err.h \
   arch/x86/include/asm/tsc.h \
   arch/x86/include/asm/cpufeature.h \
   include/vdso/time32.h \
@@ -469,7 +469,6 @@ deps_/home/edward/Documents/vMem/kernel_modules/test.mod.o := \
   arch/x86/include/asm/preempt.h \
   include/linux/thread_info.h \
     $(wildcard include/config/THREAD_INFO_IN_TASK) \
-    $(wildcard include/config/GENERIC_ENTRY) \
     $(wildcard include/config/HAVE_ARCH_WITHIN_STACK_FRAMES) \
     $(wildcard include/config/HARDENED_USERCOPY) \
     $(wildcard include/config/SH) \
@@ -485,7 +484,6 @@ deps_/home/edward/Documents/vMem/kernel_modules/test.mod.o := \
   include/linux/llist.h \
     $(wildcard include/config/ARCH_HAVE_NMI_SAFE_CMPXCHG) \
   arch/x86/include/asm/smp.h \
-    $(wildcard include/config/X86_LOCAL_APIC) \
     $(wildcard include/config/DEBUG_NMI_SELFTEST) \
   arch/x86/include/generated/asm/mmiowb.h \
   include/asm-generic/mmiowb.h \
@@ -602,6 +600,7 @@ deps_/home/edward/Documents/vMem/kernel_modules/test.mod.o := \
   include/linux/seqlock.h \
   include/linux/percpu_counter.h \
   include/linux/percpu.h \
+    $(wildcard include/config/RANDOM_KMALLOC_CACHES) \
     $(wildcard include/config/NEED_PER_CPU_PAGE_FIRST_CHUNK) \
   include/linux/mmdebug.h \
     $(wildcard include/config/DEBUG_VM) \
@@ -616,6 +615,7 @@ deps_/home/edward/Documents/vMem/kernel_modules/test.mod.o := \
     $(wildcard include/config/ZONE_DMA) \
     $(wildcard include/config/ZONE_DMA32) \
     $(wildcard include/config/ZONE_DEVICE) \
+    $(wildcard include/config/COMPACTION) \
     $(wildcard include/config/CONTIG_ALLOC) \
   include/linux/mmzone.h \
     $(wildcard include/config/ARCH_FORCE_MAX_ORDER) \
@@ -624,8 +624,6 @@ deps_/home/edward/Documents/vMem/kernel_modules/test.mod.o := \
     $(wildcard include/config/ZSMALLOC) \
     $(wildcard include/config/UNACCEPTED_MEMORY) \
     $(wildcard include/config/LRU_GEN_STATS) \
-    $(wildcard include/config/MEMORY_HOTPLUG) \
-    $(wildcard include/config/COMPACTION) \
     $(wildcard include/config/MEMORY_FAILURE) \
     $(wildcard include/config/PAGE_EXTENSION) \
     $(wildcard include/config/DEFERRED_STRUCT_PAGE_INIT) \
@@ -666,11 +664,27 @@ deps_/home/edward/Documents/vMem/kernel_modules/test.mod.o := \
     $(wildcard include/config/SCHED_MC_PRIO) \
   arch/x86/include/asm/mpspec.h \
     $(wildcard include/config/EISA) \
+    $(wildcard include/config/X86_LOCAL_APIC) \
     $(wildcard include/config/X86_MPPARSE) \
   arch/x86/include/asm/mpspec_def.h \
   arch/x86/include/asm/x86_init.h \
+  arch/x86/include/uapi/asm/bootparam.h \
+  include/linux/screen_info.h \
+    $(wildcard include/config/PCI) \
+  include/uapi/linux/screen_info.h \
+  include/linux/apm_bios.h \
+  include/uapi/linux/apm_bios.h \
+  include/linux/edd.h \
+  include/uapi/linux/edd.h \
+  arch/x86/include/asm/ist.h \
+  arch/x86/include/uapi/asm/ist.h \
+  include/video/edid.h \
+    $(wildcard include/config/X86) \
+  include/uapi/video/edid.h \
   arch/x86/include/asm/apicdef.h \
   include/asm-generic/topology.h \
+  include/linux/cpu_smt.h \
+    $(wildcard include/config/HOTPLUG_SMT) \
   include/linux/sysctl.h \
     $(wildcard include/config/SYSCTL) \
   include/uapi/linux/sysctl.h \
@@ -850,6 +864,7 @@ deps_/home/edward/Documents/vMem/kernel_modules/test.mod.o := \
   include/linux/elfnote-lto.h \
     $(wildcard include/config/LTO) \
   include/linux/export-internal.h \
+    $(wildcard include/config/PARISC) \
   include/linux/vermagic.h \
     $(wildcard include/config/PREEMPT_BUILD) \
   include/generated/utsrelease.h \
@@ -879,6 +894,6 @@ deps_/home/edward/Documents/vMem/kernel_modules/test.mod.o := \
     $(wildcard include/config/MGEODEGX1) \
     $(wildcard include/config/MGEODE_LX) \
 
-/home/edward/Documents/vMem/kernel_modules/test.mod.o: $(deps_/home/edward/Documents/vMem/kernel_modules/test.mod.o)
+/home/ed/Documents/vmem/kernel_modules/mem_scanner.mod.o: $(deps_/home/ed/Documents/vmem/kernel_modules/mem_scanner.mod.o)
 
-$(deps_/home/edward/Documents/vMem/kernel_modules/test.mod.o):
+$(deps_/home/ed/Documents/vmem/kernel_modules/mem_scanner.mod.o):

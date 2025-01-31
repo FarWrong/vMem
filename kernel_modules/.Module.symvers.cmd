@@ -1,1 +1,1 @@
-savedcmd_/home/edward/Documents/vMem/kernel_modules/Module.symvers :=  scripts/mod/modpost -m -a      -o /home/edward/Documents/vMem/kernel_modules/Module.symvers -T /home/edward/Documents/vMem/kernel_modules/modules.order -i Module.symvers -e 
+savedcmd_/home/ed/Documents/vmem/kernel_modules/Module.symvers :=  scripts/mod/modpost -M -m -a      -o /home/ed/Documents/vmem/kernel_modules/Module.symvers -T /home/ed/Documents/vmem/kernel_modules/modules.order -i Module.symvers -e 

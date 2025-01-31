@@ -35,17 +35,28 @@ MODULE_INFO(retpoline, "Y");
 
 static const struct modversion_info ____versions[]
 __used __section("__versions") = {
-	{ 0xbdfb6dbb, "__fentry__" },
-	{ 0xe007de41, "kallsyms_lookup_name" },
-	{ 0xba8fbd64, "_raw_spin_lock" },
-	{ 0x20b8e413, "gfn_to_memslot" },
-	{ 0xb5b54b34, "_raw_spin_unlock" },
-	{ 0x122c3a7e, "_printk" },
 	{ 0x5b8239ca, "__x86_return_thunk" },
-	{ 0x9ffbb7a5, "module_layout" },
+	{ 0x6c31ab71, "proc_remove" },
+	{ 0x72d79d83, "pgdir_shift" },
+	{ 0x78d27962, "boot_cpu_data" },
+	{ 0xdad13544, "ptrs_per_p4d" },
+	{ 0xc1dc5538, "pv_ops" },
+	{ 0x1d19f77b, "physical_mask" },
+	{ 0x7cd8d75e, "page_offset_base" },
+	{ 0xa648e561, "__ubsan_handle_shift_out_of_bounds" },
+	{ 0x524879e0, "mas_find" },
+	{ 0xf0fdf6cb, "__stack_chk_fail" },
+	{ 0x13c49cc2, "_copy_from_user" },
+	{ 0x5c3c7387, "kstrtoull" },
+	{ 0x916b0139, "get_khugepaged_scan" },
+	{ 0x87a21cb3, "__ubsan_handle_out_of_bounds" },
+	{ 0xbdfb6dbb, "__fentry__" },
+	{ 0xcdf68da8, "proc_create" },
+	{ 0x122c3a7e, "_printk" },
+	{ 0x33b7d108, "module_layout" },
 };
 
-MODULE_INFO(depends, "kvm");
+MODULE_INFO(depends, "");
 
 
-MODULE_INFO(srcversion, "6A3BD1615B8839BAB7D3618");
+MODULE_INFO(srcversion, "D071B0A071809E764E14B1E");
