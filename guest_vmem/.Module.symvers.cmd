@@ -1,0 +1,1 @@
+savedcmd_/home/edward/Desktop/guest_vmem/Module.symvers :=  scripts/mod/modpost -M -m -a      -o /home/edward/Desktop/guest_vmem/Module.symvers -T /home/edward/Desktop/guest_vmem/modules.order -i Module.symvers -e 
