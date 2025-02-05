@@ -119,7 +119,7 @@ static inline void kvm_hypercall_two_returns(unsigned long *val1, unsigned long 
 {
     register unsigned long rdx asm("rdx");
     register unsigned long rsi asm("rsi");
-    kvm_hypercall1(15, input);
+    kvm_hypercall1(42, input);
     *val2 = rdx;
     *val1 = rsi;
 }
@@ -167,11 +167,12 @@ void scan_kernel_text(void){
 	unsigned long pfn;
 	int level = 0;
 	for(;iter<KERNEL_IMAGE_SIZE;iter+=PAGE_SIZE){
-		phys = __phys_addr(iter);
+		phys = __phys_addr(iter + __START_KERNEL_map);
                 pfn = phys >> PAGE_SHIFT;
-		pte_t *pte = lookup_address(iter, &level);
+		pte_t *pte = lookup_address(iter+__START_KERNEL_map, &level);
                 struct two_way_page *curr = hash_lookup(pfn);
                 if(!curr){
+			printk("NEW KEY: pfn %lu",pfn);
 			u32 hash = hash_long(pfn, MSC_HASH_BITS);
                         curr = perform_lookup_on_pfn(pfn);
                         hash_add(m_scan_tb,&curr->node,hash);

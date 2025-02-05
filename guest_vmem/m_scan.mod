@@ -1,1 +1,1 @@
-/home/edward/Desktop/guest_vmem/m_scan.o
+/home/eg/vMem/guest_vmem/m_scan.o
