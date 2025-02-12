@@ -41,6 +41,7 @@ __used __section("__versions") = {
 	{ 0x59ffeca6, "kmalloc_trace" },
 	{ 0xd67eae7c, "boot_cpu_data" },
 	{ 0xa47553f, "tdx_kvm_hypercall" },
+	{ 0xa5526619, "rb_insert_color" },
 	{ 0x7cd8d75e, "page_offset_base" },
 	{ 0x8b9200fd, "lookup_address" },
 	{ 0xf0fdf6cb, "__stack_chk_fail" },
@@ -52,12 +53,14 @@ __used __section("__versions") = {
 	{ 0x48d88a2c, "__SCT__preempt_schedule" },
 	{ 0x87a21cb3, "__ubsan_handle_out_of_bounds" },
 	{ 0x54b1fac6, "__ubsan_handle_load_invalid_value" },
+	{ 0x4d9b652b, "rb_erase" },
 	{ 0x37a0cba, "kfree" },
 	{ 0x9e3a3ffd, "proc_remove" },
 	{ 0x9493fc86, "node_states" },
 	{ 0x8810754a, "_find_first_bit" },
 	{ 0x1e79f889, "node_data" },
 	{ 0x53a1e8d9, "_find_next_bit" },
+	{ 0xfb578fc5, "memset" },
 	{ 0xbdfb6dbb, "__fentry__" },
 	{ 0xec0bd42d, "proc_create" },
 	{ 0x122c3a7e, "_printk" },
@@ -67,4 +70,4 @@ __used __section("__versions") = {
 MODULE_INFO(depends, "");
 
 
-MODULE_INFO(srcversion, "8AD5CC748495D8290FF589D");
+MODULE_INFO(srcversion, "A96AB61852B2DE3A43D8392");

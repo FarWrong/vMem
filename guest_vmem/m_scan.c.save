@@ -20,6 +20,7 @@ static struct proc_dir_entry *proc_entry;
 #include <linux/rbtree.h>
 #include <linux/list.h>
 
+
 #define MSC_HASH_BITS 20
 
 enum use_types {
@@ -79,7 +80,10 @@ static struct two_way_page *rbtree_insert(struct rb_root *root, struct two_way_p
             link = &(*link)->rb_left;
         else if (new->pfn > entry->pfn)
             link = &(*link)->rb_right;
+        else
+            return entry; // Return existing node if pfn is duplicate
     }
+
     rb_link_node(&new->rb_node, parent, link);
     rb_insert_color(&new->rb_node, root);
     return NULL;
@@ -213,103 +217,6 @@ struct two_way_page *perform_lookup_on_pfn(unsigned long pfn)
 }
 
 
-#define GUEST_COLOR_BITS  10 // e.g., 2^10 = 1024 colors
-#define GUEST_COLOR_MASK  ((1 << GUEST_COLOR_BITS) - 1)
-
-/* same for host color, or just reuse if it's the same # bits */
-#define HOST_COLOR_BITS   10
-#define HOST_COLOR_MASK   ((1 << HOST_COLOR_BITS) - 1)
-
-
-static inline u16 guest_color(const struct two_way_page *pg)
-{
-    return (pg->pfn >> 6) & GUEST_COLOR_MASK;
-}
-static inline u16 host_color(const struct two_way_page *pg)
-{
-    return (pg->h_pfn >> 6) & HOST_COLOR_MASK;
-}
-
-
-static inline u64 comb2(u64 x)
-{
-    return (x * (x - 1ULL)) >> 1; // (x*(x-1))/2
-}
-
-
-static void compute_rand_index_host_guest(void)
-{
-
-    static u32 colorGH[1 << GUEST_COLOR_BITS][1 << HOST_COLOR_BITS];
-    static u32 colorG[1 << GUEST_COLOR_BITS];
-    static u32 colorH[1 << HOST_COLOR_BITS];
-
-    struct two_way_page *page;
-    u64 n = 0;
-
-    /* 2) Zero them out */
-    memset(colorGH, 0, sizeof(colorGH));
-    memset(colorG,  0, sizeof(colorG));
-    memset(colorH,  0, sizeof(colorH));
-
-    /* 3) Count how many PFNs total and fill colorGH, colorG, colorH */
-    list_for_each_entry(page, &two_way_page_list, list) {
-        u16 g = guest_color(page);
-        u16 h = host_color(page);
-
-        colorGH[g][h]++;
-        colorG[g]++;
-        colorH[h]++;
-        n++;
-    }
-
-    if (n < 2) {
-        printk("Not enough PFNs for Rand Index: n=%llu\n", n);
-        return;
-    }
-
-    u64 a = 0;
-    {
-        u64 g, h;
-        for (g = 0; g < (1 << GUEST_COLOR_BITS); g++) {
-            for (h = 0; h < (1 << HOST_COLOR_BITS); h++) {
-                u64 cnt = colorGH[g][h];
-                if (cnt > 1) {
-                    a += comb2(cnt);
-                }
-            }
-        }
-    }
-
-    u64 sumG = 0, sumH = 0;
-    {
-        u64 g, h;
-        for (g = 0; g < (1 << GUEST_COLOR_BITS); g++) {
-            if (colorG[g] > 1)
-                sumG += comb2(colorG[g]);
-        }
-        for (h = 0; h < (1 << HOST_COLOR_BITS); h++) {
-            if (colorH[h] > 1)
-                sumH += comb2(colorH[h]);
-        }
-    }
-
-    u64 total_pairs = comb2(n);
-
-    u64 b = total_pairs - (sumG + sumH - a);
-
-    u64 numerator = a + b; // # pairs that partition agrees on
-    if (total_pairs == 0) {
-        printk("Rand index denominator = 0?\n");
-        return;
-    }
-    u64 integer_part = numerator / total_pairs;
-    u64 remainder = (numerator % total_pairs) * 1000ULL;
-    remainder = div64_u64(remainder, total_pairs);
-
-    printk("Rand Index (Host vs. Guest) = %llu.%03llu (N=%llu)\n",
-           integer_part, remainder, n);
-}
 
 void scan_kernel_text(void){
 	unsigned long iter = 0;
@@ -381,6 +288,7 @@ void scan_zone(struct zone *zone, struct scan_data *scan_data) {
                         scan_data->invalid_pages+=1;
                         continue;
                 }
+
                 page = pfn_to_page(iter_pfn);
                 vaddr = (unsigned long)phys_to_virt(iter_pfn<<PAGE_SHIFT);
                 if(!page || PageReserved(page)){
@@ -447,25 +355,21 @@ void scan_hashmap_stats(void) {
 
 
 
-void free_hashmap(void)
-{
+void free_hashmap(void) {
     struct two_way_page *entry;
     struct hlist_node *tmp;
     int bkt;
 
+    /* Iterate over all hash table buckets */
     hash_for_each_safe(m_scan_tb, bkt, tmp, entry, node) {
-        hash_del(&entry->node);
-
-        rb_erase(&entry->rb_node, &two_way_page_tree);
-
-        list_del(&entry->list);
-
-        kfree(entry);
+        hash_del(&entry->node);  // Remove from hash table
+        kfree(entry);            // Free the allocated memory
     }
 }
 
 
-void scan_contiguity(unsigned long size, int spec_use, int spec_kern) {
+
+void scan_contiguity(unsigned long size) {
     struct two_way_page *entry;
 
     // 1) If the list is empty, abort early
@@ -473,6 +377,10 @@ void scan_contiguity(unsigned long size, int spec_use, int spec_kern) {
         printk("No PFNs in two_way_page_list\n");
         return;
     }
+
+    // 2) Attempt to get the first element.
+    //    It's guaranteed not to be NULL if the list isn't empty,
+    //    but we add a defensive check just in case.
     struct two_way_page *first = list_first_entry_or_null(
         &two_way_page_list, struct two_way_page, list);
     if (!first) {
@@ -492,16 +400,37 @@ void scan_contiguity(unsigned long size, int spec_use, int spec_kern) {
 
     int tr_cont = 0;
     int nt_cont = 0;
+   
 
+    //=========================================================
+    // 1) Initialize segment boundaries based on the first PFN
+    //=========================================================
     unsigned long first_pfn = first->pfn;
+    // If you suspect PFNs might be invalid, consider:
+    // if (!pfn_valid(first_pfn)) {
+    //     printk("Warning: first->pfn is invalid!\n");
+    //     return;
+    // }
+
+    // Each segment covers [strt_addr, end_addr)
     unsigned long strt_addr = (first_pfn / size) * size;
     unsigned long end_addr  = strt_addr + size;
+
+    // If the first PFN doesn't align with strt_addr, mark guest as non-contiguous
     if (first_pfn != strt_addr)
         is_cont_g = 0;
 
+    // Initialize g_prev/h_prev from the first entry
     g_prev = first_pfn;
     h_prev = first->h_pfn; // also consider checking if h_prev is valid in your environment
-    struct two_way_page *pos = first;
+
+    // Print the first PFN
+    printk("PFN: %lu\n", first_pfn);
+
+    //=========================================================
+    // 2) Now iterate the rest of the list from the second entry
+    //=========================================================
+    struct two_way_page *pos;
     list_for_each_entry_continue(pos, &two_way_page_list, list) {
         // Defensive check: if 'pos' is unexpectedly NULL, break
         if (!pos) {
@@ -509,20 +438,25 @@ void scan_contiguity(unsigned long size, int spec_use, int spec_kern) {
             break;
         }
 
-
         entry_pfn = pos->pfn;
+        // If needed, check pfn_valid(entry_pfn)
+        // if (!pfn_valid(entry_pfn)) {
+        //     printk("Warning: invalid pfn %lu\n", entry_pfn);
+        //     continue; // or break, as you see fit
+        // }
+
+        printk("PFN: %lu\n", entry_pfn);
+
+        // Check if we've crossed the boundary
         if (entry_pfn >= end_addr) {
             // finalize current segment
-            if(spec_use == -1 || entry->use_type==spec_use){
-	    if (is_cont_g) {
+            if (is_cont_g) {
                 if (is_cont_h) {
                     tr_cont++;
-		
                 } else {
                     nt_cont++;
                 }
             }
-	    }
 
             // start of next segment
             is_cont_h = 1;
@@ -549,11 +483,18 @@ void scan_contiguity(unsigned long size, int spec_use, int spec_kern) {
         h_prev = pos->h_pfn;
     }
 
+    //=========================================================
+    // 3) If you want to finalize the last segment, do it here:
+    //    (If your original code didn't do it, omit this step.)
+    //=========================================================
+    // if (is_cont_g) {
+    //     if (is_cont_h) tr_cont++;
+    //     else nt_cont++;
+    // }
 
     printk("True contiguous %lu page count: %d\n", size, tr_cont);
     printk("fake contiguous %lu page count: %d\n", size, nt_cont);
 }
-
 
 
 void do_full_scan(void){
@@ -576,20 +517,13 @@ void do_full_scan(void){
 		for (zoneid = 0; zoneid <= pgdat->kcompactd_highest_zoneidx; zoneid++) {
 			zone = &pgdat->node_zones[zoneid];
 			scan_zone(zone, &scan_data);
-			//return;
 		}
 	}
 	nid = 0;
 	scan_kernel_modules();
 	scan_kernel_text();
-	printk("Scanned Data Complete");
 //	scan_hashmap_stats();
-	printk("================ CONTIGUITY =================");
-	printk("Overall Contiguity");
-	scan_contiguity(PMD_SIZE >> PAGE_SHIFT,-1,0);
-	scan_contiguity(PUD_SIZE >> PAGE_SHIFT,-1,0);
-	printk("=============== THP==============");
-	compute_rand_index_host_guest();
+	scan_contiguity(512);
 }
 
 
@@ -599,7 +533,7 @@ void do_full_scan(void){
 static ssize_t gfn_write(struct file *file, const char __user *ubuf,
                         size_t count, loff_t *ppos){
 
-	do_full_scan();
+		do_full_scan();
     	return 1;
 }
 
